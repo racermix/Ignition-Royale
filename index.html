@@ -2,102 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ignition Royale</title>
     <style>
-        /* Base Setup */
-        body, html { 
-            margin: 0; padding: 0; 
-            width: 100%; height: 100%; 
-            overflow: hidden; 
-            font-family: 'Oswald', sans-serif;
-            perspective: 1200px; /* Essential for 3D depth */
-        }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #060a18; }
         
-        /* The Garage Environment */
+        /* The Garage */
         #garage-viewport { 
             width: 100vw; height: 100vh; 
-            background: #060a18 url('garage.jpg') no-repeat center center; 
+            background: url('garage.jpg') no-repeat center center; 
             background-size: cover;
             display: flex; align-items: center; justify-content: center;
-            touch-action: none;
-            position: relative;
         }
 
-        /* The Car Styling */
-        #car-display { 
-            width: 600px; 
-            height: auto;
-            pointer-events: none;
-            filter: drop-shadow(0 0 20px rgba(0, 150, 255, 0.5)) drop-shadow(0 20px 30px rgba(0,0,0,0.8));
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform-style: preserve-3d;
-        }
+        /* The 3D Embed */
+        .sketchfab-embed-wrapper { width: 80%; height: 60%; }
+        iframe { width: 100%; height: 100%; border: none; }
 
-        /* HUD UI Elements */
-        .top-bar { position: absolute; top: 20px; width: 90%; display: flex; justify-content: space-between; font-weight: bold; color: white; pointer-events: none; }
-        .side-bar { position: absolute; left: 20px; top: 30%; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        /* HUD UI */
         .bottom-nav { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: center; gap: 20px; }
-        
-        button { padding: 15px 25px; background: rgba(0,0,0,0.5); color: white; border: 1px solid #d4af37; cursor: pointer; pointer-events: auto; }
-        .play-btn { background: #32cd32; border: none; font-size: 20px; font-weight: bold; }
+        button { padding: 15px 30px; background: rgba(0,0,0,0.6); color: white; border: 1px solid #d4af37; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="garage-viewport">
-        <!-- Hidden engine sound -->
-        <audio id="engine-sound" src="engine.mp3" preload="auto"></audio>
-        
-        <img id="car-display" src="starter_car.png" alt="Starter Car">
-    </div>
-
-    <!-- UI Overlay -->
-    <div class="top-bar">
-        <div>Stars: 05.8K</div>
-        <div>Coins: 10.5K</div>
-    </div>
-
-    <div class="side-bar">
-        <button>SPIN WHEEL</button>
-        <button>DAILY REWARD</button>
+        <!-- Sketchfab Embed -->
+        <div class="sketchfab-embed-wrapper">
+            <iframe title="C7 Corvette rally car" frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" src="https://sketchfab.com/models/0244735e425a4625bfa4d83267e7827a/embed?autostart=1&ui_controls=1&ui_infos=0&ui_inspector=0"></iframe>
+        </div>
     </div>
 
     <div class="bottom-nav">
-        <button>RATE US</button>
-        <button>RESUME</button>
-        <button class="play-btn" onclick="alert('Starting Race!')">PLAY >></button>
+        <button onclick="alert('Engine Revving!')">REV ENGINE</button>
+        <button>PLAY >></button>
     </div>
 
-    <script>
-        const viewport = document.getElementById('garage-viewport');
-        const car = document.getElementById('car-display');
-        const engineSound = document.getElementById('engine-sound');
-        
-        let isDragging = false;
-        let rotation = 0;
-
-        // Interaction Logic
-        viewport.addEventListener('mousedown', () => {
-            isDragging = true;
-            engineSound.play().catch(() => {}); // Play sound on interaction
-        });
-        
-        viewport.addEventListener('touchstart', () => {
-            isDragging = true;
-            engineSound.play().catch(() => {});
-        });
-        
-        window.addEventListener('mousemove', (e) => {
-            if (isDragging) {
-                rotation += e.movementX * 0.5;
-                // Combined rotation for 3D look
-                car.style.transform = `rotateY(${rotation}deg) rotateX(2deg)`;
-            }
-        });
-
-        window.addEventListener('mouseup', () => isDragging = false);
-        window.addEventListener('touchend', () => isDragging = false);
-    </script>
 </body>
 </html>
