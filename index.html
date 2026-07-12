@@ -1,41 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ignition Royale</title>
     <style>
-        body { margin: 0; background: #060a18; color: white; font-family: sans-serif; overflow: hidden; }
+        /* Base Setup */
+        body, html { 
+            margin: 0; padding: 0; 
+            width: 100%; height: 100%; 
+            overflow: hidden; 
+            font-family: 'Oswald', sans-serif;
+            perspective: 1200px; /* Essential for 3D depth */
+        }
         
         /* The Garage Environment */
         #garage-viewport { 
             width: 100vw; height: 100vh; 
-            /* Replace 'garage.jpg' with your garage photo file name */
-            background: radial-gradient(circle, #1a2a6c 0%, #060a18 70%); 
+            background: #060a18 url('garage.jpg') no-repeat center center; 
+            background-size: cover;
             display: flex; align-items: center; justify-content: center;
             touch-action: none;
+            position: relative;
         }
 
         /* The Car Styling */
         #car-display { 
-            width: 600px; /* Adjust based on your image size */
+            width: 600px; 
             height: auto;
             pointer-events: none;
-            filter: drop-shadow(0 20px 30px rgba(0,0,0,0.8));
-            transition: transform 0.1s ease-out;
+            filter: drop-shadow(0 0 20px rgba(0, 150, 255, 0.5)) drop-shadow(0 20px 30px rgba(0,0,0,0.8));
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
         }
 
         /* HUD UI Elements */
-        .top-bar { position: absolute; top: 20px; width: 90%; display: flex; justify-content: space-between; font-weight: bold; }
-        .side-bar { position: absolute; left: 20px; top: 30%; display: flex; flex-direction: column; gap: 10px; }
+        .top-bar { position: absolute; top: 20px; width: 90%; display: flex; justify-content: space-between; font-weight: bold; color: white; pointer-events: none; }
+        .side-bar { position: absolute; left: 20px; top: 30%; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .bottom-nav { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: center; gap: 20px; }
         
-        button { padding: 15px 25px; background: rgba(0,0,0,0.5); color: white; border: 1px solid #d4af37; cursor: pointer; }
+        button { padding: 15px 25px; background: rgba(0,0,0,0.5); color: white; border: 1px solid #d4af37; cursor: pointer; pointer-events: auto; }
         .play-btn { background: #32cd32; border: none; font-size: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div id="garage-viewport">
-        <!-- Load your transparent car image here -->
+        <!-- Hidden engine sound -->
+        <audio id="engine-sound" src="engine.mp3" preload="auto"></audio>
+        
         <img id="car-display" src="starter_car.png" alt="Starter Car">
     </div>
 
@@ -59,17 +72,27 @@
     <script>
         const viewport = document.getElementById('garage-viewport');
         const car = document.getElementById('car-display');
+        const engineSound = document.getElementById('engine-sound');
+        
         let isDragging = false;
         let rotation = 0;
 
         // Interaction Logic
-        viewport.addEventListener('mousedown', () => isDragging = true);
-        viewport.addEventListener('touchstart', () => isDragging = true);
+        viewport.addEventListener('mousedown', () => {
+            isDragging = true;
+            engineSound.play().catch(() => {}); // Play sound on interaction
+        });
+        
+        viewport.addEventListener('touchstart', () => {
+            isDragging = true;
+            engineSound.play().catch(() => {});
+        });
         
         window.addEventListener('mousemove', (e) => {
             if (isDragging) {
                 rotation += e.movementX * 0.5;
-                car.style.transform = `rotateY(${rotation}deg)`;
+                // Combined rotation for 3D look
+                car.style.transform = `rotateY(${rotation}deg) rotateX(2deg)`;
             }
         });
 
