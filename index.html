@@ -1,49 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <style>
-    body { background: #060a18; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-    #showroomCanvas { border: 2px solid #d4af37; border-radius: 50%; box-shadow: 0 0 50px rgba(212, 175, 55, 0.2); }
-  </style>
+    <style>
+        body { margin: 0; background: #060a18; color: white; font-family: sans-serif; overflow: hidden; }
+        
+        /* The Garage Environment */
+        .garage-bg { 
+            width: 100vw; height: 100vh; 
+            background: radial-gradient(circle, #1a2a6c 0%, #060a18 70%); 
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* HUD LAYOUT */
+        .top-bar { position: absolute; top: 10px; width: 95%; display: flex; justify-content: space-between; }
+        .side-bar { position: absolute; left: 10px; top: 20%; display: flex; flex-direction: column; gap: 15px; }
+        .bottom-nav { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: center; gap: 20px; }
+
+        /* The Rotating Car */
+        #car-display { width: 300px; height: 150px; background: #0056b3; border-radius: 20px; 
+                       box-shadow: 0 20px 50px rgba(0,0,0,0.8); transition: transform 0.5s; }
+        
+        /* Play Button */
+        .play-btn { padding: 20px 60px; background: #32cd32; border: none; font-size: 24px; font-weight: bold; cursor: pointer; color: white; border-radius: 5px; }
+    </style>
 </head>
 <body>
-  <canvas id="showroomCanvas" width="400" height="400"></canvas>
 
-  <script>
-    const canvas = document.getElementById('showroomCanvas');
-    const ctx = canvas.getContext('2d');
-    let angle = 0;
+    <div class="garage-bg">
+        <!-- Top Stats -->
+        <div class="top-bar">
+            <div>Stars: 05.8K</div>
+            <div>Coins: 10.5K</div>
+        </div>
 
-    function drawCar() {
-      ctx.clearRect(0, 0, 400, 400);
-      
-      // 1. Draw Pedestal
-      ctx.fillStyle = "#1a1f2e";
-      ctx.beginPath();
-      ctx.ellipse(200, 300, 100, 30, 0, 0, Math.PI * 2);
-      ctx.fill();
+        <!-- Sidebar -->
+        <div class="side-bar">
+            <button>SPIN WHEEL</button>
+            <button>DAILY REWARD</button>
+        </div>
 
-      // 2. Rotate and Draw Car
-      ctx.save();
-      ctx.translate(200, 200);
-      ctx.rotate(angle);
-      
-      // Car Body (Stylized)
-      ctx.fillStyle = "#007bff";
-      ctx.roundRect(-60, -25, 120, 50, 10); // Rounded Rectangle Body
-      ctx.fill();
-      
-      // Car Windows
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(-30, -20, 25, 15); // Front
-      ctx.fillRect(5, -20, 25, 15);   // Back
-      
-      ctx.restore();
+        <!-- Car in the center -->
+        <div id="car-display"></div>
 
-      angle += 0.02; // Rotation Speed
-      requestAnimationFrame(drawCar);
-    }
-    drawCar();
-  </script>
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <button>RATE US</button>
+            <button>RESUME</button>
+            <button class="play-btn" onclick="startGame()">PLAY >></button>
+        </div>
+    </div>
+
+    <script>
+        let angle = 0;
+        const car = document.getElementById('car-display');
+
+        // Simple rotation animation
+        function animate() {
+            angle += 0.5;
+            car.style.transform = `rotateY(${angle}deg)`;
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        function startGame() { alert("Starting Ignition Royale..."); }
+    </script>
 </body>
 </html>
