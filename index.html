@@ -11,39 +11,39 @@
             width: 100vw; height: 100vh; 
             background: url('garage.jpg') no-repeat center center; 
             background-size: cover;
-            display: flex; align-items: center; justify-content: center;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        /* The Stage: The parent container for car and podium */
-        .car-stage {
+        /* This container holds both the podium and the car */
+        .stage {
             position: relative;
             width: 800px;
-            height: 500px;
+            height: 400px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        /* The Podium: Now fixed at the bottom of the stage */
+        /* The Podium: Fixed at the base of the stage */
         .podium {
             position: absolute;
-            bottom: 50px;
-            width: 600px;
-            height: 100px;
-            background: radial-gradient(ellipse, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 70%);
+            bottom: 20px;
+            width: 500px;
+            height: 80px;
+            background: radial-gradient(ellipse, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 70%);
             border-radius: 50%;
-            z-index: 1; /* Sits behind the iframe */
+            z-index: 1;
         }
 
-        /* The Iframe: Pinned to the center of the stage */
-        .sketchfab-embed-wrapper { 
+        /* The Iframe: Smaller so it doesn't hide the whole screen */
+        .sketchfab-wrapper { 
             position: relative;
             width: 100%; 
             height: 100%; 
-            z-index: 2; /* Sits in front of the podium */
+            z-index: 2; 
         }
         
-        iframe { width: 100%; height: 100%; border: none; background: transparent; }
+        iframe { width: 100%; height: 100%; border: none; }
 
         .ui-container { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: center; gap: 20px; z-index: 10; }
         button { padding: 15px 30px; background: rgba(0,0,0,0.6); color: white; border: 1px solid #d4af37; cursor: pointer; text-transform: uppercase; font-weight: bold; }
@@ -53,9 +53,9 @@
 <body>
 
     <div id="garage-viewport">
-        <div class="car-stage">
+        <div class="stage">
             <div class="podium"></div>
-            <div class="sketchfab-embed-wrapper">
+            <div class="sketchfab-wrapper">
                 <iframe 
                     title="chevrolet corvette c7.r" 
                     frameborder="0" 
