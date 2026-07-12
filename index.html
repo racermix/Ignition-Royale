@@ -18,12 +18,26 @@
             background: url('garage.jpg') no-repeat center center; 
             background-size: cover;
             display: flex; align-items: center; justify-content: center;
+            position: relative;
         }
 
-        /* 3D Embed Styling */
+        /* The Podium */
+        .podium {
+            position: absolute;
+            bottom: 15%;
+            width: 400px;
+            height: 100px;
+            background: radial-gradient(ellipse, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%;
+            z-index: 1; /* Keeps it behind the car */
+            pointer-events: none;
+        }
+
+        /* 3D Embed Wrapper - Set to be transparent */
         .sketchfab-embed-wrapper { 
             width: 100%; height: 100%; 
-            background: transparent; 
+            background: transparent;
+            z-index: 2; /* Keeps the car in front of the podium */
         }
 
         iframe { 
@@ -41,14 +55,14 @@
 <body>
 
     <div id="garage-viewport">
+        <!-- The visual podium -->
+        <div class="podium"></div>
+
         <div class="sketchfab-embed-wrapper">
             <iframe 
                 title="chevrolet corvette c7.r" 
                 frameborder="0" 
                 allowfullscreen 
-                mozallowfullscreen="true" 
-                webkitallowfullscreen="true" 
-                allow="autoplay; fullscreen; xr-spatial-tracking" 
                 src="https://sketchfab.com/models/c514f64a6638447aa0026c332a283806/embed?autostart=1&ui_controls=1&ui_infos=0&ui_inspector=0&transparent=1&ui_theme=dark">
             </iframe>
         </div>
