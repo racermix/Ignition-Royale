@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ignition Royale</title>
+
+    <!-- Google's <model-viewer> web component. Open source, no vendor
+         dashboard/branding baked in — we fully control the styling. -->
+    <script type="module" src="https://unpkg.com/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -46,9 +51,6 @@
         }
 
         /* ── GROUND LIGHT ───────────────────────────────────────── */
-        /* A tight blue light pool that sits right under the car's wheels,
-           matching the car's own footprint width so it reads as contact
-           light/shadow rather than a separate glowing pad floating below. */
         .ground-light {
             position: absolute;
             bottom: 4px;
@@ -71,37 +73,20 @@
             filter: blur(1.5px);
         }
 
-        /* ── STATIC CAR IMAGE ──────────────────────────────────── */
-        /* Sits flat on the garage floor, angled ¾ front/side, grounded in
-           the blue light pool. perspective on the wrapper lets the spin
-           animation below feel like real rotation instead of a flat flip. */
-        .car-image-wrap {
+        /* ── 3D CAR VIEWER ─────────────────────────────────────── */
+        /* This replaces both the old Sketchfab iframe AND the flat PNG.
+           camera-target is pinned to the model's own center, so orbiting
+           never drags the car off the podium/light — it only rotates in
+           place. min/max-camera-orbit locks the vertical (polar) angle so
+           it can't be spun upside-down or viewed from underneath. */
+        model-viewer {
             position: relative;
             z-index: 2;
             width: 100%;
-            display: flex;
-            justify-content: center;
-            margin-bottom: -66px;
-            perspective: 900px;
-        }
-
-        .car-image-wrap img {
-            width: 68%;
-            max-width: 400px;
-            height: auto;
-            object-fit: contain;
-            filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.6));
-            cursor: pointer;
-            transform-style: preserve-3d;
-        }
-
-        /* ── TAP-TO-SPIN ────────────────────────────────────────── */
-        @keyframes carSpin {
-            from { transform: rotateY(0deg); }
-            to   { transform: rotateY(360deg); }
-        }
-        .car-image-wrap img.spinning {
-            animation: carSpin 1.1s ease-in-out;
+            height: 100%;
+            --poster-color: transparent;
+            background: transparent;
+            touch-action: none;
         }
 
         /* ── CAR INFO TAG ───────────────────────────────────────── */
@@ -120,6 +105,18 @@
             line-height: 1.5;
         }
         .car-info-tag strong { color: #d4af37; display: block; font-size: 14px; }
+
+        /* Small, unobtrusive credit line — required by the model's CC BY
+           4.0 license. Sits bottom-right, low visual weight. */
+        .model-credit {
+            position: absolute;
+            bottom: 6px;
+            right: 10px;
+            z-index: 5;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.35);
+        }
+        .model-credit a { color: inherit; text-decoration: none; }
 
         /* ── BOTTOM BUTTONS ─────────────────────────────────────── */
         .ui-container {
@@ -175,7 +172,7 @@
 <div id="garage-viewport">
 
     <div class="car-info-tag">
-        <strong>Mercedes-AMG GT R</strong>
+        <strong>Concept GT</strong>
         Ignition Royale
     </div>
 
@@ -183,15 +180,33 @@
 
         <div class="ground-light"></div>
 
-        <div class="car-image-wrap">
-            <img id="carImg" src="white car 1.png" alt="Mercedes-AMG GT R" onclick="spinCar()">
-        </div>
+        <model-viewer
+            id="carViewer"
+            src="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/CarConcept/glTF-Binary/CarConcept.glb"
+            alt="Concept GT showcase car"
+            camera-controls
+            disable-pan
+            camera-orbit="35deg 78deg 105%"
+            camera-target="0m 0.5m 0m"
+            min-camera-orbit="auto 55deg auto"
+            max-camera-orbit="auto 100deg auto"
+            min-field-of-view="25deg"
+            max-field-of-view="45deg"
+            interaction-prompt="none"
+            shadow-intensity="1"
+            environment-image="neutral"
+            exposure="1.1">
+        </model-viewer>
 
     </div>
 
     <div class="ui-container">
         <button class="rev-btn" onclick="revEngine()">REV ENGINE</button>
         <button class="play-btn" onclick="startRace()">PLAY &gt;&gt;</button>
+    </div>
+
+    <div class="model-credit">
+        "Car Concept" by Khronos Group, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>
     </div>
 
 </div>
@@ -207,14 +222,6 @@
 
     function startRace() {
         alert('Starting Race!');
-    }
-
-    function spinCar() {
-        const img = document.getElementById('carImg');
-        img.classList.remove('spinning');
-        void img.offsetWidth; // restart animation cleanly on repeat taps
-        img.classList.add('spinning');
-        img.addEventListener('animationend', () => img.classList.remove('spinning'), { once: true });
     }
 </script>
 
