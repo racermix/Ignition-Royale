@@ -45,81 +45,51 @@
             justify-content: flex-end;
         }
 
-        /* ── PODIUM ─────────────────────────────────────────────── */
-        .podium {
+        /* ── GROUND LIGHT ───────────────────────────────────────── */
+        /* Replaces the podium: a soft blue light pool on the garage floor,
+           like a showroom spotlight, that the car sits flat on top of. */
+        .ground-light {
             position: absolute;
-            bottom: -54px;
+            bottom: 6px;
             left: 50%;
             transform: translateX(-50%);
-            width: 62%;
-            height: 90px;
-            z-index: 3;
+            width: 78%;
+            height: 60px;
+            z-index: 1;
             pointer-events: none;
+            background: radial-gradient(ellipse at center, rgba(64, 156, 255, 0.55) 0%, rgba(64, 156, 255, 0.25) 40%, transparent 75%);
+            filter: blur(6px);
         }
 
-        .podium::before {
+        /* a tighter, brighter core right under the car */
+        .ground-light::after {
             content: '';
             position: absolute;
-            inset: -24px -34px 0 -34px;
+            inset: 14px 20% 6px 20%;
             border-radius: 50%;
-            background: radial-gradient(ellipse at center, rgba(255,255,255,0.30) 0%, transparent 70%);
-            filter: blur(8px);
-        }
-
-        .podium-body {
-            position: absolute;
-            left: 6%;
-            right: 6%;
-            top: 26px;
-            bottom: 8px;
-            background: linear-gradient(180deg, #f2f2f2 0%, #d8d8d8 40%, #b0b0b0 100%);
-            border-radius: 0 0 40% 40% / 0 0 18px 18px;
-            box-shadow: 0 10px 22px rgba(0,0,0,0.4);
-        }
-
-        .podium-step {
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            height: 22px;
-            border-radius: 50%;
-            background: linear-gradient(180deg, #e6e6e6, #9c9c9c);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.45);
-        }
-
-        .podium-top {
-            position: absolute;
-            left: 3%;
-            right: 3%;
-            top: 0;
-            height: 40px;
-            border-radius: 50%;
-            background: radial-gradient(ellipse at 50% 35%, #ffffff 0%, #f1f1f1 55%, #d0d0d0 100%);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+            background: radial-gradient(ellipse at center, rgba(140, 200, 255, 0.65) 0%, transparent 70%);
+            filter: blur(3px);
         }
 
         /* ── STATIC CAR IMAGE ──────────────────────────────────── */
-        /* Replaces the old Sketchfab iframe entirely. Sits directly on
-           the podium top, angled ¾ front/side per the reference photo.
-           No rotation, no viewer chrome — just a grounded shot. */
+        /* Replaces the old Sketchfab iframe entirely. Sits flat on the
+           garage floor, angled ¾ front/side, grounded in the blue light
+           pool rather than raised on a podium. No rotation, no viewer
+           chrome — just a grounded shot. */
         .car-image-wrap {
             position: relative;
             z-index: 2;
             width: 100%;
             display: flex;
             justify-content: center;
-            /* pulls the car down so its wheels land on the podium top
-               rather than floating above it */
-            margin-bottom: -18px;
         }
 
         .car-image-wrap img {
-            width: 60%;
-            max-width: 360px;
+            width: 68%;
+            max-width: 400px;
             height: auto;
             object-fit: contain;
-            filter: drop-shadow(0 14px 10px rgba(0, 0, 0, 0.55));
+            filter: drop-shadow(0 10px 8px rgba(0, 0, 0, 0.6));
         }
 
         /* ── CAR INFO TAG ───────────────────────────────────────── */
@@ -199,11 +169,7 @@
 
     <div class="car-stage" id="carStage">
 
-        <div class="podium">
-            <div class="podium-body"></div>
-            <div class="podium-step"></div>
-            <div class="podium-top"></div>
-        </div>
+        <div class="ground-light"></div>
 
         <div class="car-image-wrap">
             <img src="white car 1.png" alt="Mercedes-AMG GT R">
