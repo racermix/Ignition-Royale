@@ -38,12 +38,12 @@
         /* ── CAR STAGE ─────────────────────────────────────────── */
         .car-stage {
             position: absolute;
-            top: 46%;
+            top: 44%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 1;
-            width: min(680px, 92vw);
-            height: min(420px, 50vh);
+            width: min(820px, 96vw);
+            height: min(520px, 58vh);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -53,11 +53,11 @@
         /* ── GROUND LIGHT ───────────────────────────────────────── */
         .ground-light {
             position: absolute;
-            bottom: 4px;
+            bottom: 22px;
             left: 50%;
             transform: translateX(-50%);
-            width: 40%;
-            height: 16px;
+            width: 46%;
+            height: 20px;
             z-index: 1;
             pointer-events: none;
             background: radial-gradient(ellipse at center, rgba(90, 180, 255, 0.85) 0%, rgba(64, 156, 255, 0.4) 55%, transparent 80%);
@@ -87,6 +87,56 @@
             --poster-color: transparent;
             background: transparent;
             touch-action: none;
+        }
+
+        /* ── CAR SELECTOR ──────────────────────────────────────── */
+        .selector-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 6;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.55);
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            color: #d4af37;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            transition: background 0.15s ease, transform 0.1s ease;
+            user-select: none;
+        }
+        .selector-arrow:hover { background: rgba(212, 175, 55, 0.2); }
+        .selector-arrow:active { transform: translateY(-50%) scale(0.92); }
+        .selector-arrow.prev { left: 4%; }
+        .selector-arrow.next { right: 4%; }
+
+        .selector-dots {
+            position: absolute;
+            bottom: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 6;
+            display: flex;
+            gap: 10px;
+        }
+        .selector-dots .dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: background 0.15s ease, transform 0.15s ease;
+        }
+        .selector-dots .dot.active {
+            background: #d4af37;
+            border-color: #d4af37;
+            transform: scale(1.2);
         }
 
         /* ── CAR INFO TAG ───────────────────────────────────────── */
@@ -172,8 +222,8 @@
 <div id="garage-viewport">
 
     <div class="car-info-tag">
-        <strong>Concept GT</strong>
-        Ignition Royale
+        <strong id="carName">Concept GT</strong>
+        <span id="carTrim">Carmine Candy</span>
     </div>
 
     <div class="car-stage" id="carStage">
@@ -186,17 +236,24 @@
             alt="Concept GT showcase car"
             camera-controls
             disable-pan
-            camera-orbit="35deg 78deg 105%"
-            camera-target="0m 0.5m 0m"
-            min-camera-orbit="auto 55deg auto"
-            max-camera-orbit="auto 100deg auto"
-            min-field-of-view="25deg"
-            max-field-of-view="45deg"
+            camera-orbit="35deg 80deg 78%"
+            camera-target="0m 0.28m 0m"
+            field-of-view="30deg"
+            min-camera-orbit="auto 58deg auto"
+            max-camera-orbit="auto 98deg auto"
+            min-field-of-view="22deg"
+            max-field-of-view="40deg"
             interaction-prompt="none"
-            shadow-intensity="1"
+            shadow-intensity="1.1"
+            shadow-softness="0.8"
             environment-image="neutral"
             exposure="1.1">
         </model-viewer>
+
+        <div class="selector-arrow prev" onclick="changeCar(-1)">&#10094;</div>
+        <div class="selector-arrow next" onclick="changeCar(1)">&#10095;</div>
+
+        <div class="selector-dots" id="selectorDots"></div>
 
     </div>
 
@@ -223,6 +280,48 @@
     function startRace() {
         alert('Starting Race!');
     }
+
+    // ── CAR SELECTOR ─────────────────────────────────────────────
+    // The Car Concept model ships with 3 built-in paint variants
+    // (KHR_materials_variants). Switching is instant — same model,
+    // no reload — using model-viewer's variantName property.
+    const carOptions = [
+        { variant: 'Carmine Candy',   label: 'Carmine Candy' },
+        { variant: 'Pearly Swirly',   label: 'Pearly Swirly' },
+        { variant: 'Torched Graphite', label: 'Torched Graphite' }
+    ];
+    let currentCarIndex = 0;
+
+    const viewer = document.getElementById('carViewer');
+    const trimLabel = document.getElementById('carTrim');
+    const dotsWrap = document.getElementById('selectorDots');
+
+    // build dot indicators
+    carOptions.forEach((opt, i) => {
+        const dot = document.createElement('div');
+        dot.className = 'dot' + (i === 0 ? ' active' : '');
+        dot.onclick = () => selectCar(i);
+        dotsWrap.appendChild(dot);
+    });
+
+    function selectCar(index) {
+        currentCarIndex = (index + carOptions.length) % carOptions.length;
+        const opt = carOptions[currentCarIndex];
+        viewer.variantName = opt.variant;
+        trimLabel.textContent = opt.label;
+        [...dotsWrap.children].forEach((dot, i) => {
+            dot.classList.toggle('active', i === currentCarIndex);
+        });
+    }
+
+    function changeCar(direction) {
+        selectCar(currentCarIndex + direction);
+    }
+
+    // apply the default variant once the model has finished loading
+    viewer.addEventListener('load', () => {
+        viewer.variantName = carOptions[currentCarIndex].variant;
+    });
 </script>
 
 </body>
