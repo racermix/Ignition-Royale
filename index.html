@@ -35,13 +35,169 @@
             z-index: 0;
         }
 
+        /* ── ROTATING SPOTLIGHTS ──────────────────────────────────
+           Two conic-gradient beams that slowly sweep across the garage,
+           screen-blended so they read as light rather than a flat shape. */
+        .spotlight-sweep {
+            position: absolute;
+            inset: -20% -20%;
+            z-index: 1;
+            pointer-events: none;
+            mix-blend-mode: screen;
+            opacity: 0.35;
+        }
+        .spotlight-sweep::before, .spotlight-sweep::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 140%; height: 140%;
+            background: conic-gradient(from 0deg,
+                transparent 0deg, transparent 350deg,
+                rgba(212, 175, 55, 0.5) 355deg, transparent 360deg);
+            transform-origin: center;
+            animation: sweep 9s linear infinite;
+        }
+        .spotlight-sweep::after {
+            background: conic-gradient(from 0deg,
+                transparent 0deg, transparent 350deg,
+                rgba(64, 156, 255, 0.4) 355deg, transparent 360deg);
+            animation: sweep 13s linear infinite reverse;
+        }
+        @keyframes sweep {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to   { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* ── FLOOR SHIMMER ─────────────────────────────────────────
+           A soft diagonal shine that slowly sweeps across the lower
+           third of the frame, simulating a reflective wet floor. */
+        .floor-shimmer {
+            position: absolute;
+            left: -30%; right: -30%; bottom: 0;
+            height: 38%;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+            opacity: 0.5;
+        }
+        .floor-shimmer::before {
+            content: '';
+            position: absolute;
+            top: 0; bottom: 0; left: -60%;
+            width: 40%;
+            background: linear-gradient(100deg, transparent, rgba(120, 190, 255, 0.18), transparent);
+            animation: shimmerSlide 7s ease-in-out infinite;
+        }
+        @keyframes shimmerSlide {
+            0%   { left: -60%; }
+            50%  { left: 120%; }
+            100% { left: 120%; }
+        }
+
+        /* ── DRIFTING SMOKE ────────────────────────────────────────
+           Two large soft blurred blobs drifting slowly sideways,
+           low opacity so it reads as haze rather than clouds. */
+        .smoke-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .smoke-blob {
+            position: absolute;
+            bottom: -10%;
+            width: 55%;
+            height: 45%;
+            border-radius: 50%;
+            background: radial-gradient(ellipse at center, rgba(180, 200, 220, 0.10) 0%, transparent 70%);
+            filter: blur(18px);
+        }
+        .smoke-blob.a { left: -10%; animation: smokeDriftA 22s ease-in-out infinite; }
+        .smoke-blob.b { right: -15%; animation: smokeDriftB 28s ease-in-out infinite; }
+        @keyframes smokeDriftA {
+            0%, 100% { transform: translateX(0) scale(1); }
+            50% { transform: translateX(12%) scale(1.1); }
+        }
+        @keyframes smokeDriftB {
+            0%, 100% { transform: translateX(0) scale(1); }
+            50% { transform: translateX(-10%) scale(1.05); }
+        }
+
+        /* ── DRIFTING DUST PARTICLES ───────────────────────────── */
+        .dust-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .dust {
+            position: absolute;
+            bottom: 0;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: rgba(212, 175, 55, 0.55);
+            animation: dustFloat linear infinite;
+        }
+        @keyframes dustFloat {
+            0%   { transform: translateY(0) translateX(0); opacity: 0; }
+            10%  { opacity: 0.7; }
+            90%  { opacity: 0.4; }
+            100% { transform: translateY(-90vh) translateX(20px); opacity: 0; }
+        }
+
+        /* ── LED STRIPS ────────────────────────────────────────── */
+        .led-strip {
+            position: absolute;
+            z-index: 1;
+            pointer-events: none;
+            background: linear-gradient(90deg, transparent, #d4af37, #05d9e8, #d4af37, transparent);
+            background-size: 200% 100%;
+            animation: ledPulse 4s ease-in-out infinite;
+            opacity: 0.55;
+            filter: blur(1px);
+        }
+        .led-strip.top    { top: 0; left: 0; right: 0; height: 3px; }
+        .led-strip.bottom { bottom: 0; left: 0; right: 0; height: 3px; }
+        @keyframes ledPulse {
+            0%, 100% { background-position: 0% 50%; opacity: 0.4; }
+            50%      { background-position: 100% 50%; opacity: 0.75; }
+        }
+
+        /* ── GARAGE DOOR REVEAL ───────────────────────────────────
+           A dark panel that "rolls up" once on page load, revealing
+           the scene like a garage door opening. */
+        .garage-door {
+            position: absolute;
+            inset: 0;
+            z-index: 15;
+            background: linear-gradient(#0a0a12, #14141c);
+            transform-origin: top;
+            animation: doorOpen 1.6s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+            animation-delay: 0.3s;
+        }
+        .garage-door::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: repeating-linear-gradient(
+                to bottom, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 2px, transparent 2px, transparent 22px
+            );
+        }
+        @keyframes doorOpen {
+            from { transform: scaleY(1); }
+            to   { transform: scaleY(0); }
+        }
+
         /* ── CAR STAGE ─────────────────────────────────────────── */
         .car-stage {
             position: absolute;
             top: 58%;
             left: 50%;
             transform: translate(-50%, -50%);
-            z-index: 1;
+            z-index: 2;
             width: min(900px, 96vw);
             height: min(600px, 65vh);
             display: flex;
@@ -50,10 +206,12 @@
             justify-content: flex-end;
         }
 
-        /* ── GROUND LIGHT ───────────────────────────────────────── */
+        /* ── GROUND LIGHT / NEON UNDERGLOW ────────────────────────
+           Color updates to loosely match the selected paint variant
+           via JS (see script), so the glow feels tied to the car. */
         .ground-light {
             position: absolute;
-            bottom: 12%; 
+            bottom: 12%;
             left: 50%;
             transform: translateX(-50%);
             width: 55%;
@@ -62,8 +220,13 @@
             pointer-events: none;
             background: radial-gradient(ellipse at center, rgba(90, 180, 255, 0.85) 0%, rgba(64, 156, 255, 0.4) 55%, transparent 80%);
             filter: blur(3px);
+            transition: background 0.4s ease;
+            animation: underglowPulse 2.4s ease-in-out infinite;
         }
-
+        @keyframes underglowPulse {
+            0%, 100% { opacity: 0.85; }
+            50%      { opacity: 1; }
+        }
         .ground-light::after {
             content: '';
             position: absolute;
@@ -71,6 +234,46 @@
             border-radius: 50%;
             background: radial-gradient(ellipse at center, rgba(200, 230, 255, 0.9) 0%, transparent 70%);
             filter: blur(1.5px);
+        }
+
+        /* ── BRAKE LIGHT FLASH (triggered by REV ENGINE) ─────────── */
+        .brake-flash {
+            position: absolute;
+            bottom: 16%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 18%;
+            height: 14px;
+            z-index: 3;
+            pointer-events: none;
+            border-radius: 4px;
+            background: radial-gradient(ellipse at center, rgba(255, 40, 40, 0.9) 0%, transparent 75%);
+            opacity: 0;
+        }
+        .brake-flash.flash {
+            animation: brakeFlash 0.5s ease-out 2;
+        }
+        @keyframes brakeFlash {
+            0%, 100% { opacity: 0; }
+            50%      { opacity: 1; }
+        }
+
+        /* ── EXHAUST PUFFS (spawned by REV ENGINE) ────────────────── */
+        .exhaust-puff {
+            position: absolute;
+            bottom: 14%;
+            left: 50%;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(200, 200, 210, 0.5), transparent 70%);
+            pointer-events: none;
+            z-index: 3;
+            animation: puffOut 1s ease-out forwards;
+        }
+        @keyframes puffOut {
+            0%   { transform: translate(-50%, 0) scale(0.5); opacity: 0.7; }
+            100% { transform: translate(calc(-50% + var(--drift, 0px)), -60px) scale(2.4); opacity: 0; }
         }
 
         /* ── 3D CAR VIEWER ─────────────────────────────────────── */
@@ -161,6 +364,23 @@
         }
         .model-credit a { color: inherit; text-decoration: none; }
 
+        /* ── AMBIENT AUDIO TOGGLE ─────────────────────────────────── */
+        .ambient-toggle {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            z-index: 6;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            background: rgba(0, 0, 0, 0.55);
+            color: #d4af37;
+            cursor: pointer;
+            font-size: 15px;
+            backdrop-filter: blur(4px);
+        }
+
         /* ── BOTTOM BUTTONS ─────────────────────────────────────── */
         .ui-container {
             position: absolute;
@@ -220,7 +440,7 @@
                 transform: translateX(-50%) scale(0.85);
             }
             .ground-light {
-                bottom: 8%; 
+                bottom: 8%;
             }
             .selector-arrow {
                 width: 36px; height: 36px; font-size: 16px;
@@ -235,14 +455,27 @@
 
 <div id="garage-viewport">
 
+    <div class="spotlight-sweep"></div>
+    <div class="floor-shimmer"></div>
+    <div class="smoke-layer">
+        <div class="smoke-blob a"></div>
+        <div class="smoke-blob b"></div>
+    </div>
+    <div class="dust-layer" id="dustLayer"></div>
+    <div class="led-strip top"></div>
+    <div class="led-strip bottom"></div>
+
     <div class="car-info-tag">
         <strong id="carName">Concept GT</strong>
         <span id="carTrim">Carmine Candy</span>
     </div>
 
+    <button class="ambient-toggle" id="ambientBtn" onclick="toggleAmbient()">🔈</button>
+
     <div class="car-stage" id="carStage">
 
-        <div class="ground-light"></div>
+        <div class="ground-light" id="groundLight"></div>
+        <div class="brake-flash" id="brakeFlash"></div>
 
         <model-viewer
             id="carViewer"
@@ -250,7 +483,9 @@
             alt="Concept GT showcase car"
             camera-controls
             disable-pan
-            scale="1.3 1.3 1.3" 
+            auto-rotate
+            rotation-per-second="8deg"
+            scale="1.3 1.3 1.3"
             camera-orbit="35deg 80deg 65%"
             camera-target="0m 0.15m 0m"
             field-of-view="30deg"
@@ -281,33 +516,110 @@
         "Car Concept" by Khronos Group, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>
     </div>
 
+    <div class="garage-door"></div>
+
 </div>
 
 <script>
+    // ── DUST PARTICLES ───────────────────────────────────────────
+    const dustLayer = document.getElementById('dustLayer');
+    for (let i = 0; i < 26; i++) {
+        const d = document.createElement('div');
+        d.className = 'dust';
+        d.style.left = Math.random() * 100 + '%';
+        d.style.animationDuration = (10 + Math.random() * 14) + 's';
+        d.style.animationDelay = (Math.random() * 14) + 's';
+        dustLayer.appendChild(d);
+    }
+
+    // ── REV ENGINE: shake + brake flash + exhaust puffs ─────────
     function revEngine() {
         const stage = document.getElementById('carStage');
         stage.classList.remove('revving');
         void stage.offsetWidth;
         stage.classList.add('revving');
         stage.addEventListener('animationend', () => stage.classList.remove('revving'), { once: true });
+
+        const brake = document.getElementById('brakeFlash');
+        brake.classList.remove('flash');
+        void brake.offsetWidth;
+        brake.classList.add('flash');
+
+        for (let i = 0; i < 5; i++) {
+            setTimeout(() => spawnExhaustPuff(), i * 90);
+        }
+
+        playRevSound();
     }
 
-    // Updated startRace function to transition to game.html
+    function spawnExhaustPuff() {
+        const puff = document.createElement('div');
+        puff.className = 'exhaust-puff';
+        puff.style.setProperty('--drift', (Math.random() * 30 - 15) + 'px');
+        document.getElementById('carStage').appendChild(puff);
+        setTimeout(() => puff.remove(), 1100);
+    }
+
+    // ── SYNTHESIZED AUDIO (no external files needed) ─────────────
+    let audioCtx = null, ambientNodes = null, ambientOn = false;
+    function ensureAudio() {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    function toggleAmbient() {
+        ensureAudio();
+        ambientOn = !ambientOn;
+        document.getElementById('ambientBtn').textContent = ambientOn ? '🔊' : '🔈';
+        if (ambientOn) startAmbient(); else stopAmbient();
+    }
+    function startAmbient() {
+        const o1 = audioCtx.createOscillator();
+        const o2 = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        o1.type = 'sine'; o1.frequency.value = 55;
+        o2.type = 'sine'; o2.frequency.value = 82.5;
+        gain.gain.value = 0.02;
+        o1.connect(gain); o2.connect(gain); gain.connect(audioCtx.destination);
+        o1.start(); o2.start();
+        ambientNodes = { o1, o2, gain };
+    }
+    function stopAmbient() {
+        if (!ambientNodes) return;
+        ambientNodes.o1.stop(); ambientNodes.o2.stop();
+        ambientNodes = null;
+    }
+    function playRevSound() {
+        ensureAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(80, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(320, audioCtx.currentTime + 0.25);
+        osc.frequency.exponentialRampToValueAtTime(90, audioCtx.currentTime + 0.6);
+        gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.65);
+        osc.connect(gain).connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.65);
+    }
+
+    // ── START RACE ────────────────────────────────────────────────
     function startRace() {
         const selectedVariant = encodeURIComponent(carOptions[currentCarIndex].variant);
         window.location.href = `game.html?car=${selectedVariant}`;
     }
 
+    // ── CAR SELECTOR (3 built-in paint variants via KHR_materials_variants) ──
     const carOptions = [
-        { variant: 'Carmine Candy',   label: 'Carmine Candy' },
-        { variant: 'Pearly Swirly',   label: 'Pearly Swirly' },
-        { variant: 'Torched Graphite', label: 'Torched Graphite' }
+        { variant: 'Carmine Candy',    label: 'Carmine Candy',    glow: 'rgba(255, 70, 70, 0.85)' },
+        { variant: 'Pearly Swirly',    label: 'Pearly Swirly',    glow: 'rgba(220, 230, 255, 0.85)' },
+        { variant: 'Torched Graphite', label: 'Torched Graphite', glow: 'rgba(90, 180, 255, 0.85)' }
     ];
     let currentCarIndex = 0;
 
     const viewer = document.getElementById('carViewer');
     const trimLabel = document.getElementById('carTrim');
     const dotsWrap = document.getElementById('selectorDots');
+    const groundLight = document.getElementById('groundLight');
 
     carOptions.forEach((opt, i) => {
         const dot = document.createElement('div');
@@ -321,6 +633,8 @@
         const opt = carOptions[currentCarIndex];
         viewer.variantName = opt.variant;
         trimLabel.textContent = opt.label;
+        groundLight.style.background =
+            `radial-gradient(ellipse at center, ${opt.glow} 0%, rgba(64,156,255,0.35) 55%, transparent 80%)`;
         [...dotsWrap.children].forEach((dot, i) => {
             dot.classList.toggle('active', i === currentCarIndex);
         });
