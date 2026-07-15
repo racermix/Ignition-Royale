@@ -292,8 +292,10 @@
         stage.addEventListener('animationend', () => stage.classList.remove('revving'), { once: true });
     }
 
+    // Updated startRace function to transition to game.html
     function startRace() {
-        alert('Starting Race!');
+        const selectedVariant = encodeURIComponent(carOptions[currentCarIndex].variant);
+        window.location.href = `game.html?car=${selectedVariant}`;
     }
 
     const carOptions = [
