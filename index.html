@@ -38,7 +38,7 @@
         /* ── CAR STAGE ─────────────────────────────────────────── */
         .car-stage {
             position: absolute;
-            top: 48%;
+            top: 58%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 1;
@@ -53,8 +53,7 @@
         /* ── GROUND LIGHT ───────────────────────────────────────── */
         .ground-light {
             position: absolute;
-            /* Adjusted to sit right beneath the scaled car's wheels */
-            bottom: 18%; 
+            bottom: 12%; 
             left: 50%;
             transform: translateX(-50%);
             width: 55%;
@@ -214,14 +213,14 @@
         @media (max-height: 500px) and (orientation: landscape) {
             .car-stage {
                 height: 80vh;
-                top: 50%;
+                top: 62%;
             }
             .ui-container {
                 bottom: 3%;
-                transform: translateX(-50%) scale(0.85); /* Scales buttons down to fit */
+                transform: translateX(-50%) scale(0.85);
             }
             .ground-light {
-                bottom: 12%; 
+                bottom: 8%; 
             }
             .selector-arrow {
                 width: 36px; height: 36px; font-size: 16px;
@@ -245,9 +244,6 @@
 
         <div class="ground-light"></div>
 
-        <!-- Added scale="1.3 1.3 1.3" to make the cars larger.
-             Adjusted camera-orbit from 78% to 65% for a closer default zoom.
-             Adjusted camera-target to center the larger model properly. -->
         <model-viewer
             id="carViewer"
             src="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/CarConcept/glTF-Binary/CarConcept.glb"
