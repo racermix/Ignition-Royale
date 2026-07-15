@@ -3,441 +3,354 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ignition Royale - Bangkok Run</title>
+    <title>Ignition Royale - Bangkok Neon Run</title>
+   
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
     
-    <!-- Three.js Core and GLTFLoader -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background: #0a001f; font-family: sans-serif; }
+        #game-container { display: block; width: 100%; height: 100%; }
         
-        body, html {
-            width: 100%; height: 100%; overflow: hidden;
-            background: #03050a;
-            font-family: sans-serif;
-            touch-action: none;
-        }
-
-        #game-container {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
-
-        /* ── UI OVERLAYS ───────────────────────────────────────── */
         #ui-layer {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 20px;
-            z-index: 10;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; display: flex; flex-direction: column;
+            justify-content: space-between; padding: 20px; z-index: 10; color: #fff;
         }
-
-        .hud-top {
-            display: flex;
-            justify-content: space-between;
-            color: #fff;
-            font-size: 20px;
-            font-weight: bold;
-            text-shadow: 0 0 10px #05d9e8;
-        }
-
-        /* ── MENUS ─────────────────────────────────────────────── */
+        .hud-top { display: flex; justify-content: space-between; font-size: 22px; font-weight: bold; text-shadow: 0 0 15px #05d9e8; }
+        
         .overlay-screen {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(3, 5, 10, 0.9);
-            backdrop-filter: blur(8px);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 20;
-            pointer-events: auto;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 0, 31, 0.95); backdrop-filter: blur(10px);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20;
         }
-
-        #gameOverScreen { display: none; }
-
-        h1 {
-            color: #ff2a6d;
-            font-size: 48px;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            text-shadow: 0 0 20px #ff2a6d;
-        }
-
-        p { color: #fff; font-size: 24px; margin-bottom: 30px; }
-
+        h1 { color: #ff2a6d; font-size: 52px; text-transform: uppercase; text-shadow: 0 0 30px #ff2a6d; }
         .btn {
-            background: #05d9e8;
-            color: #0b0f19;
-            border: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            font-weight: 800;
-            text-transform: uppercase;
-            cursor: pointer;
-            border-radius: 4px;
-            margin: 10px;
-            box-shadow: 0 4px 15px rgba(5, 217, 232, 0.4);
-            transition: transform 0.1s ease;
+            background: #05d9e8; color: #0b0f19; border: none; padding: 16px 36px;
+            font-size: 20px; font-weight: 900; text-transform: uppercase; cursor: pointer;
+            border-radius: 4px; margin: 12px; box-shadow: 0 0 20px rgba(5, 217, 232, 0.6);
         }
-
-        .btn:active { transform: scale(0.95); }
-        .btn.secondary {
-            background: transparent;
-            color: #d4af37;
-            border: 2px solid #d4af37;
-            box-shadow: none;
-        }
-
-        /* Mobile controls hint */
-        #mobile-controls {
-            position: absolute;
-            bottom: 20px; width: 100%; text-align: center;
-            color: rgba(255,255,255,0.5); font-size: 14px; display: none;
-        }
-        @media (max-width: 768px) { #mobile-controls { display: block; } }
     </style>
 </head>
 <body>
-
     <div id="game-container"></div>
-
     <div id="ui-layer">
         <div class="hud-top">
-            <div id="scoreDisplay">Distance: 0m</div>
-            <div id="speedDisplay">Speed: 0 km/h</div>
+            <div id="scoreDisplay">DISTANCE: 0m</div>
+            <div id="speedDisplay">SPEED: 0 km/h</div>
         </div>
-        <div id="mobile-controls">Tap Left/Right to Steer. Hold center to Brake.</div>
     </div>
 
-    <!-- Loading Screen -->
     <div id="loadingScreen" class="overlay-screen">
-        <h1 style="color: #05d9e8; text-shadow: 0 0 20px #05d9e8;">Loading Assets...</h1>
-        <p>Importing 3D Models & Neon Lights</p>
+        <h1 style="color:#05d9e8">NEON LOADING...</h1>
     </div>
 
-    <!-- Game Over Screen -->
-    <div id="gameOverScreen" class="overlay-screen">
-        <h1>Wrecked!</h1>
+    <div id="gameOverScreen" class="overlay-screen" style="display:none">
+        <h1>WRECKED IN THE NEON</h1>
         <p id="finalScore">Distance: 0m</p>
-        <div>
-            <button class="btn" onclick="resetGame()">Race Again</button>
-            <button class="btn secondary" onclick="window.location.href='index.html'">Garage</button>
-        </div>
+        <button class="btn" onclick="resetGame()">RACE AGAIN</button>
     </div>
 
 <script>
-    // ── GAME STATE ─────────────────────────────────────────────
-    let isGameOver = false;
-    let distance = 0;
-    let currentSpeed = 0; // m/s
-    const maxSpeed = 60; // top speed
-    const acceleration = 0.5;
-    const braking = 1.5;
-    const drag = 0.2;
-    const steerSpeed = 0.3;
+// ── GAME STATE ─────────────────────────────────────────────
+let isGameOver = false;
+let distance = 0;
+let currentSpeed = 0;
+const maxSpeed = 75;
+const acceleration = 0.6;
+const braking = 2;
+const drag = 0.25;
+const steerSpeed = 0.35;
 
-    let baseCarModel = null;
-    let playerCar = null;
-    let trafficCars = [];
-    const lanes = [-3.5, 0, 3.5]; // Left, Center, Right lanes
-    let laneZTracker = [0, 0, 0]; // Tracks the Z pos of the last car in each lane
+let baseCarModel = null;
+let playerCar = null;
+let trafficCars = [];
+const lanes = [-4, 0, 4];
+let laneZTracker = [0, 0, 0];
 
-    // ── SCENE SETUP ─────────────────────────────────────────────
-    const container = document.getElementById('game-container');
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x03050a);
-    scene.fog = new THREE.FogExp2(0x03050a, 0.015); // Fog hides horizon, blends city
+// ── SCENE SETUP ─────────────────────────────────────────────
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a001f);
+scene.fog = new THREE.FogExp2(0x1a0033, 0.012);
 
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 300);
-    camera.position.set(0, 3, 7); // Positioned slightly above and behind player
-    camera.lookAt(0, 0, -10);
+const camera = new THREE.PerspectiveCamera(62, window.innerWidth / window.innerHeight, 0.1, 400);
+camera.position.set(0, 4, 8);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+document.getElementById('game-container').appendChild(renderer.domElement);
+
+// ── CYBERPUNK LIGHTING ─────────────────────────────────────
+const ambient = new THREE.AmbientLight(0x334455, 0.4);
+scene.add(ambient);
+
+const moonLight = new THREE.DirectionalLight(0x8899ff, 0.3);
+moonLight.position.set(15, 30, 20);
+scene.add(moonLight);
+
+// Neon accents
+const neonPink = new THREE.PointLight(0xff2a6d, 3, 80);
+const neonCyan = new THREE.PointLight(0x05d9e8, 3, 80);
+neonPink.position.set(-15, 8, -10);
+neonCyan.position.set(15, 8, -10);
+scene.add(neonPink, neonCyan);
+
+// ── ROAD ───────────────────────────────────────────────────
+const road = new THREE.Mesh(
+    new THREE.PlaneGeometry(14, 600),
+    new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.9 })
+);
+road.rotation.x = -Math.PI / 2;
+road.position.z = -150;
+scene.add(road);
+
+// Dashed lines (simple)
+const lineMat = new THREE.LineBasicMaterial({ color: 0xffee88 });
+for (let i = -1; i <= 1; i++) {
+    const points = [];
+    for (let z = 0; z > -400; z -= 8) {
+        points.push(new THREE.Vector3(i * 3.8, 0.1, z));
+        points.push(new THREE.Vector3(i * 3.8, 0.1, z - 4));
+    }
+    const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), lineMat);
+    scene.add(line);
+}
+
+// ── PROCEDURAL BUILDINGS (Cyberpunk Style) ─────────────────
+const buildings = new THREE.Group();
+scene.add(buildings);
+
+const neonColors = [0xff2a6d, 0x05d9e8, 0xd4af37, 0x9900ff, 0x00ff9f];
+
+function createSkyscraper(x, z) {
+    const height = 25 + Math.random() * 45;
+    const width = 6 + Math.random() * 4;
+    const depth = 6 + Math.random() * 4;
+    
+    const building = new THREE.Mesh(
+        new THREE.BoxGeometry(width, height, depth),
+        new THREE.MeshStandardMaterial({ color: 0x0f0a1f, emissive: 0x110033, metalness: 0.3 })
+    );
+    building.position.set(x, height/2, z);
+    building.castShadow = true;
+    building.receiveShadow = true;
+    
+    // Neon edges
+    const edges = new THREE.EdgesGeometry(building.geometry);
+    const neonMat = new THREE.LineBasicMaterial({ 
+        color: neonColors[Math.floor(Math.random()*neonColors.length)] 
+    });
+    const wire = new THREE.LineSegments(edges, neonMat);
+    building.add(wire);
+    
+    // Random glowing windows
+    if (Math.random() > 0.4) {
+        const windowLight = new THREE.PointLight(0x88ffff, 1.5, 12);
+        windowLight.position.set(0, height * (0.3 + Math.random()*0.5), 0);
+        building.add(windowLight);
+    }
+    
+    buildings.add(building);
+}
+
+// Populate
+for (let i = 0; i < 35; i++) {
+    const z = -20 - i * 18;
+    createSkyscraper(-14 - Math.random()*8, z);
+    createSkyscraper(14 + Math.random()*8, z);
+}
+
+// ── RAIN PARTICLES (simple) ────────────────────────────────
+const rainCount = 800;
+const rainGeo = new THREE.BufferGeometry();
+const rainPos = new Float32Array(rainCount * 3);
+const rainVel = new Float32Array(rainCount * 3);
+
+for (let i = 0; i < rainCount * 3; i += 3) {
+    rainPos[i]     = Math.random() * 60 - 30;
+    rainPos[i + 1] = Math.random() * 40;
+    rainPos[i + 2] = Math.random() * 100 - 80;
+    
+    rainVel[i]     = (Math.random() - 0.5) * 0.5;
+    rainVel[i + 1] = -8 - Math.random() * 12;
+    rainVel[i + 2] = (Math.random() - 0.5) * 2;
+}
+
+rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPos, 3));
+const rainMat = new THREE.PointsMaterial({ color: 0x88ccff, size: 0.15, transparent: true, opacity: 0.6 });
+const rain = new THREE.Points(rainGeo, rainMat);
+scene.add(rain);
+
+// ── CAR LOADING ─────────────────────────────────────────────
+const loader = new THREE.GLTFLoader();
+const carUrl = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/CarConcept/glTF-Binary/CarConcept.glb'; 
+// TODO: Replace with a better cyberpunk model URL if you host one
+
+loader.load(carUrl, (gltf) => {
+    baseCarModel = gltf.scene;
+    baseCarModel.scale.set(0.9, 0.9, 0.9);
+    baseCarModel.rotation.y = Math.PI;
+
+    playerCar = baseCarModel.clone();
+    // Add neon underglow
+    const glow = new THREE.PointLight(0x00ffff, 2, 8);
+    glow.position.set(0, -0.5, 0);
+    playerCar.add(glow);
+    
+    playerCar.position.set(0, 0.8, 0);
+    scene.add(playerCar);
+
+    document.getElementById('loadingScreen').style.display = 'none';
+    spawnTraffic(); spawnTraffic(); spawnTraffic();
+    animate();
+});
+
+// ── TRAFFIC ─────────────────────────────────────────────────
+function spawnTraffic() {
+    if (!baseCarModel) return;
+    const laneIndex = Math.floor(Math.random() * 3);
+    const spawnZ = camera.position.z - 140 - Math.random() * 60;
+
+    if (laneZTracker[laneIndex] < spawnZ + 35) return;
+
+    const aiCar = baseCarModel.clone();
+    const col = neonColors[Math.floor(Math.random() * neonColors.length)];
+    
+    aiCar.traverse(child => {
+        if (child.isMesh && child.material) {
+            child.material = child.material.clone();
+            if (child.material.name.toLowerCase().includes('body')) {
+                child.material.color.setHex(col);
+                child.material.emissive = new THREE.Color(col).multiplyScalar(0.3);
+            }
+        }
+    });
+
+    aiCar.position.set(lanes[laneIndex], 0.8, spawnZ);
+    aiCar.userData = {
+        speed: 12 + Math.random() * 22,
+        lane: laneIndex
+    };
+    
+    scene.add(aiCar);
+    trafficCars.push(aiCar);
+    laneZTracker[laneIndex] = spawnZ;
+}
+
+// ── CONTROLS ────────────────────────────────────────────────
+const keys = {};
+window.addEventListener('keydown', e => keys[e.key] = true);
+window.addEventListener('keyup',   e => keys[e.key] = false);
+
+let touchX = 0;
+window.addEventListener('touchstart', e => touchX = e.touches[0].clientX);
+window.addEventListener('touchmove',  e => touchX = e.touches[0].clientX);
+
+// ── MAIN LOOP ───────────────────────────────────────────────
+function animate() {
+    if (isGameOver) return;
+    requestAnimationFrame(animate);
+
+    // Speed
+    const accel = (keys['w'] || keys['ArrowUp'] || (touchX && (touchX < innerWidth*0.35 || touchX > innerWidth*0.65))) ? acceleration : 0;
+    const brake = (keys['s'] || keys['ArrowDown'] || (touchX && touchX > innerWidth*0.35 && touchX < innerWidth*0.65)) ? braking : 0;
+    
+    currentSpeed += accel - brake - drag;
+    currentSpeed = Math.max(0, Math.min(currentSpeed, maxSpeed));
+
+    distance += currentSpeed * 0.016;
+    document.getElementById('scoreDisplay').textContent = `DISTANCE: ${Math.floor(distance)}m`;
+    document.getElementById('speedDisplay').textContent = `SPEED: ${Math.floor(currentSpeed * 3.6)} km/h`;
+
+    // Steering
+    if (currentSpeed > 2) {
+        const turn = (keys['a'] || keys['ArrowLeft'] || (touchX && touchX < innerWidth/2)) ? -1 : 
+                     (keys['d'] || keys['ArrowRight'] || (touchX && touchX > innerWidth/2)) ? 1 : 0;
+        
+        playerCar.position.x += turn * steerSpeed * (currentSpeed / maxSpeed + 0.3);
+        playerCar.position.x = Math.max(-5, Math.min(5, playerCar.position.x));
+        playerCar.rotation.z = -playerCar.position.x * 0.08;
+    }
+
+    // Move world
+    buildings.children.forEach(b => {
+        b.position.z += currentSpeed * 0.018;
+        if (b.position.z > camera.position.z + 30) b.position.z -= 380;
+    });
+
+    // Traffic
+    laneZTracker = [0,0,0];
+    for (let i = trafficCars.length-1; i >= 0; i--) {
+        const car = trafficCars[i];
+        const relSpeed = (currentSpeed - car.userData.speed) * 0.018;
+        car.position.z += relSpeed;
+
+        // Occasional lane change
+        if (Math.random() < 0.008) {
+            const newLane = Math.max(0, Math.min(2, car.userData.lane + (Math.random() > 0.5 ? 1 : -1)));
+            car.position.x = lanes[newLane];
+            car.userData.lane = newLane;
+        }
+
+        // Collision
+        if (Math.abs(playerCar.position.x - car.position.x) < 2.2 && 
+            Math.abs(playerCar.position.z - car.position.z) < 3) {
+            gameOver();
+        }
+
+        if (car.position.z > camera.position.z + 15) {
+            scene.remove(car);
+            trafficCars.splice(i, 1);
+        } else {
+            const laneIdx = lanes.indexOf(Math.round(car.position.x));
+            if (laneIdx !== -1) laneZTracker[laneIdx] = Math.min(laneZTracker[laneIdx], car.position.z);
+        }
+    }
+
+    // Spawn
+    if (Math.random() < 0.045 && trafficCars.length < 12) spawnTraffic();
+
+    // Rain
+    const positions = rain.geometry.attributes.position.array;
+    for (let i = 1; i < positions.length; i += 3) {
+        positions[i] += rainVel[i];
+        if (positions[i] < -5) positions[i] = 45;
+    }
+    rain.geometry.attributes.position.needsUpdate = true;
+
+    // Camera bob
+    camera.position.y = 4 + Math.sin(Date.now() * 0.008) * 0.08;
+
+    renderer.render(scene, camera);
+}
+
+function gameOver() {
+    isGameOver = true;
+    document.getElementById('finalScore').textContent = `Distance: ${Math.floor(distance)}m`;
+    document.getElementById('gameOverScreen').style.display = 'flex';
+}
+
+function resetGame() {
+    isGameOver = false;
+    distance = 0;
+    currentSpeed = 0;
+    playerCar.position.set(0, 0.8, 0);
+    playerCar.rotation.z = 0;
+    trafficCars.forEach(c => scene.remove(c));
+    trafficCars = [];
+    laneZTracker = [0,0,0];
+    document.getElementById('gameOverScreen').style.display = 'none';
+    spawnTraffic(); spawnTraffic();
+    animate();
+}
+
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.shadowMap.enabled = true;
-    container.appendChild(renderer.domElement);
-
-    // ── LIGHTING (Bangkok Vibe) ─────────────────────────────────
-    const ambientLight = new THREE.AmbientLight(0x222233);
-    scene.add(ambientLight);
-
-    const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
-    dirLight.position.set(10, 20, 10);
-    scene.add(dirLight);
-
-    // Neon glows
-    const pinkLight = new THREE.PointLight(0xff2a6d, 2, 50);
-    pinkLight.position.set(-10, 5, 0);
-    scene.add(pinkLight);
-
-    const cyanLight = new THREE.PointLight(0x05d9e8, 2, 50);
-    cyanLight.position.set(10, 5, 0);
-    scene.add(cyanLight);
-
-    // ── ENVIRONMENT ─────────────────────────────────────────────
-    // Road
-    const roadGeo = new THREE.PlaneGeometry(12, 400);
-    const roadMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.8 });
-    const road = new THREE.Mesh(roadGeo, roadMat);
-    road.rotation.x = -Math.PI / 2;
-    road.position.z = -100;
-    scene.add(road);
-
-    // City Buildings (Procedural blocks on the sides)
-    const buildings = new THREE.Group();
-    scene.add(buildings);
-    
-    const neonColors = [0xff2a6d, 0x05d9e8, 0xd4af37, 0x9900ff];
-
-    function createBuilding(x, z) {
-        const height = Math.random() * 20 + 10;
-        const geo = new THREE.BoxGeometry(5, height, 5);
-        
-        // Dark building with neon wireframe edges
-        const mat = new THREE.MeshStandardMaterial({ color: 0x0a0a11 });
-        const mesh = new THREE.Mesh(geo, mat);
-        mesh.position.set(x, height/2, z);
-
-        // Neon trim
-        const edges = new THREE.EdgesGeometry(geo);
-        const neonColor = neonColors[Math.floor(Math.random() * neonColors.length)];
-        const lineMat = new THREE.LineBasicMaterial({ color: neonColor });
-        const wireframe = new THREE.LineSegments(edges, lineMat);
-        mesh.add(wireframe);
-
-        buildings.add(mesh);
-    }
-
-    // Populate initial city
-    for(let z = 10; z > -300; z -= 15) {
-        createBuilding(-12 - Math.random()*5, z);
-        createBuilding(12 + Math.random()*5, z);
-    }
-
-    // ── ASSET LOADING ───────────────────────────────────────────
-    const loader = new THREE.GLTFLoader();
-    const carUrl = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/CarConcept/glTF-Binary/CarConcept.glb';
-
-    loader.load(carUrl, function(gltf) {
-        baseCarModel = gltf.scene;
-        // Scale and orient the car
-        baseCarModel.scale.set(0.8, 0.8, 0.8);
-        baseCarModel.rotation.y = Math.PI; // Face forward away from camera
-
-        // Read intended color from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const variant = urlParams.get('car');
-        let carColor = 0xff0000; // default red
-        if(variant === 'Pearly Swirly') carColor = 0xe0e0e0;
-        if(variant === 'Torched Graphite') carColor = 0x333333;
-
-        // Clone for player
-        playerCar = cloneCar(baseCarModel, carColor);
-        playerCar.position.set(0, 0, 0); // Player sits at Z=0
-        scene.add(playerCar);
-
-        document.getElementById('loadingScreen').style.display = 'none';
-        
-        // Initial traffic population
-        spawnTraffic();
-        spawnTraffic();
-        spawnTraffic();
-
-        animate();
-    });
-
-    // Helper: Safely clone the GLTF scene and apply color tint
-    function cloneCar(baseScene, hexColor) {
-        const clone = baseScene.clone();
-        clone.traverse((child) => {
-            if (child.isMesh) {
-                child.material = child.material.clone();
-                // If it looks like car paint, tint it
-                if (child.material.name.toLowerCase().includes('paint') || child.material.name.toLowerCase().includes('body')) {
-                    child.material.color.setHex(hexColor);
-                }
-            }
-        });
-        return clone;
-    }
-
-    // ── TRAFFIC SYSTEM ──────────────────────────────────────────
-    function spawnTraffic() {
-        if (!baseCarModel) return;
-
-        const laneIndex = Math.floor(Math.random() * 3);
-        const spawnZ = camera.position.z - 150 - Math.random() * 50; // Spawn far ahead
-
-        // Anti-overlap check: Don't spawn if another car in this lane is too close
-        if (laneZTracker[laneIndex] < spawnZ + 30) {
-            return; 
-        }
-
-        const trafficColor = neonColors[Math.floor(Math.random() * neonColors.length)];
-        const aiCar = cloneCar(baseCarModel, trafficColor);
-        
-        aiCar.position.set(lanes[laneIndex], 0, spawnZ);
-        
-        // Traffic metadata
-        aiCar.userData = {
-            speed: Math.random() * 15 + 10, // AI travels at 10-25 m/s
-            width: 1.8,  // hitbox width
-            length: 4.0  // hitbox length
-        };
-
-        scene.add(aiCar);
-        trafficCars.push(aiCar);
-        laneZTracker[laneIndex] = spawnZ;
-    }
-
-    // ── CONTROLS ────────────────────────────────────────────────
-    const keys = { w: false, s: false, a: false, d: false, ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false };
-    
-    window.addEventListener('keydown', (e) => { if (keys.hasOwnProperty(e.key)) keys[e.key] = true; });
-    window.addEventListener('keyup', (e) => { if (keys.hasOwnProperty(e.key)) keys[e.key] = false; });
-
-    // Touch Support
-    let touchX = null;
-    let isTouching = false;
-    window.addEventListener('touchstart', (e) => { touchX = e.touches[0].clientX; isTouching = true; });
-    window.addEventListener('touchmove', (e) => { touchX = e.touches[0].clientX; });
-    window.addEventListener('touchend', () => { touchX = null; isTouching = false; });
-
-    // ── MAIN LOOP ───────────────────────────────────────────────
-    function animate() {
-        if (isGameOver) return;
-        requestAnimationFrame(animate);
-
-        // 1. Calculate Speed (Throttle/Brake)
-        let isAccelerating = keys.w || keys.ArrowUp || (isTouching && (touchX < window.innerWidth*0.3 || touchX > window.innerWidth*0.7));
-        let isBraking = keys.s || keys.ArrowDown || (isTouching && touchX > window.innerWidth*0.3 && touchX < window.innerWidth*0.7);
-
-        if (isAccelerating) {
-            currentSpeed += acceleration;
-        } else if (isBraking) {
-            currentSpeed -= braking;
-        } else {
-            currentSpeed -= drag;
-        }
-        
-        currentSpeed = Math.max(0, Math.min(currentSpeed, maxSpeed));
-        
-        // Update UI
-        distance += currentSpeed / 60; // approx distance per frame
-        document.getElementById('scoreDisplay').textContent = `Distance: ${Math.floor(distance)}m`;
-        document.getElementById('speedDisplay').textContent = `Speed: ${Math.floor(currentSpeed * 3.6)} km/h`; // convert m/s to km/h
-
-        // 2. Steering (Only steer if moving)
-        if (currentSpeed > 0) {
-            if (keys.a || keys.ArrowLeft || (touchX !== null && touchX < window.innerWidth / 2)) {
-                playerCar.position.x -= steerSpeed * (currentSpeed/maxSpeed + 0.2);
-            }
-            if (keys.d || keys.ArrowRight || (touchX !== null && touchX > window.innerWidth / 2)) {
-                playerCar.position.x += steerSpeed * (currentSpeed/maxSpeed + 0.2);
-            }
-            // Clamp to road limits
-            playerCar.position.x = Math.max(-4.5, Math.min(4.5, playerCar.position.x));
-            
-            // Banking visual effect
-            playerCar.rotation.z = -playerCar.position.x * 0.05;
-        }
-
-        // 3. Move Environment (Illusion of speed)
-        // We move the buildings towards the camera
-        buildings.children.forEach(b => {
-            b.position.z += currentSpeed * 0.016; // delta time approx
-            if (b.position.z > camera.position.z + 10) {
-                b.position.z -= 300; // Send back to horizon
-            }
-        });
-
-        // 4. Update Traffic & Collision
-        // Reset lane trackers for next spawn cycle
-        laneZTracker = [0, 0, 0]; 
-
-        for (let i = trafficCars.length - 1; i >= 0; i--) {
-            let aiCar = trafficCars[i];
-            
-            // Relative speed: AI moves down Z, minus player's speed pulling them towards camera
-            let relativeSpeed = (currentSpeed - aiCar.userData.speed) * 0.016;
-            aiCar.position.z += relativeSpeed;
-
-            // Update lane tracker for spawning logic
-            let laneIdx = lanes.indexOf(aiCar.position.x);
-            if (laneIdx !== -1 && aiCar.position.z < laneZTracker[laneIdx]) {
-                laneZTracker[laneIdx] = aiCar.position.z;
-            }
-
-            // Simple Box Collision Detection
-            let zDist = Math.abs(playerCar.position.z - aiCar.position.z);
-            let xDist = Math.abs(playerCar.position.x - aiCar.position.x);
-
-            if (zDist < 2.5 && xDist < 1.5) {
-                gameOver();
-            }
-
-            // Remove cars that passed behind the camera
-            if (aiCar.position.z > camera.position.z + 10) {
-                scene.remove(aiCar);
-                trafficCars.splice(i, 1);
-            }
-        }
-
-        // 5. Spawn new traffic randomly
-        if (Math.random() < 0.03 && trafficCars.length < 8) {
-            spawnTraffic();
-        }
-
-        // 6. Camera Shake effect at high speeds
-        if (currentSpeed > maxSpeed * 0.8) {
-            camera.position.x = (Math.random() - 0.5) * 0.05;
-            camera.position.y = 3 + (Math.random() - 0.5) * 0.05;
-        } else {
-            camera.position.x = 0;
-            camera.position.y = 3;
-        }
-
-        renderer.render(scene, camera);
-    }
-
-    function gameOver() {
-        isGameOver = true;
-        document.getElementById('finalScore').textContent = `Distance: ${Math.floor(distance)}m`;
-        document.getElementById('gameOverScreen').style.display = 'flex';
-    }
-
-    function resetGame() {
-        isGameOver = false;
-        distance = 0;
-        currentSpeed = 0;
-        playerCar.position.set(0, 0, 0);
-        playerCar.rotation.z = 0;
-
-        // Clear old traffic
-        trafficCars.forEach(car => scene.remove(car));
-        trafficCars = [];
-        laneZTracker = [0, 0, 0];
-
-        document.getElementById('gameOverScreen').style.display = 'none';
-        
-        spawnTraffic();
-        animate();
-    }
-
-    // Handle Window Resize
-    window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-
+});
 </script>
 </body>
 </html>
