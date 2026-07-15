@@ -46,42 +46,45 @@
         }
 
         /* ── GROUND LIGHT ───────────────────────────────────────── */
-        /* Replaces the podium: a soft blue light pool on the garage floor,
-           like a showroom spotlight, that the car sits flat on top of. */
+        /* A tight blue light pool that sits right under the car's wheels,
+           reading as light emitting from the car itself rather than a
+           separate glow floating below it. */
         .ground-light {
             position: absolute;
-            bottom: 6px;
+            bottom: 18px;
             left: 50%;
             transform: translateX(-50%);
-            width: 78%;
-            height: 60px;
+            width: 58%;
+            height: 34px;
             z-index: 1;
             pointer-events: none;
-            background: radial-gradient(ellipse at center, rgba(64, 156, 255, 0.55) 0%, rgba(64, 156, 255, 0.25) 40%, transparent 75%);
-            filter: blur(6px);
+            background: radial-gradient(ellipse at center, rgba(90, 180, 255, 0.75) 0%, rgba(64, 156, 255, 0.35) 45%, transparent 75%);
+            filter: blur(4px);
         }
 
-        /* a tighter, brighter core right under the car */
         .ground-light::after {
             content: '';
             position: absolute;
-            inset: 14px 20% 6px 20%;
+            inset: 6px 22% 2px 22%;
             border-radius: 50%;
-            background: radial-gradient(ellipse at center, rgba(140, 200, 255, 0.65) 0%, transparent 70%);
-            filter: blur(3px);
+            background: radial-gradient(ellipse at center, rgba(180, 220, 255, 0.85) 0%, transparent 70%);
+            filter: blur(2px);
         }
 
         /* ── STATIC CAR IMAGE ──────────────────────────────────── */
         /* Replaces the old Sketchfab iframe entirely. Sits flat on the
            garage floor, angled ¾ front/side, grounded in the blue light
-           pool rather than raised on a podium. No rotation, no viewer
-           chrome — just a grounded shot. */
+           pool rather than raised on a podium. The reference photo has
+           empty margin below the wheels within the image itself, so we
+           pull the image down with a negative margin to close that gap
+           and land the tires right in the light. */
         .car-image-wrap {
             position: relative;
             z-index: 2;
             width: 100%;
             display: flex;
             justify-content: center;
+            margin-bottom: -46px;
         }
 
         .car-image-wrap img {
@@ -89,7 +92,7 @@
             max-width: 400px;
             height: auto;
             object-fit: contain;
-            filter: drop-shadow(0 10px 8px rgba(0, 0, 0, 0.6));
+            filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.6));
         }
 
         /* ── CAR INFO TAG ───────────────────────────────────────── */
