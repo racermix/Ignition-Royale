@@ -38,12 +38,12 @@
         /* ── CAR STAGE ─────────────────────────────────────────── */
         .car-stage {
             position: absolute;
-            top: 44%;
+            top: 48%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 1;
-            width: min(820px, 96vw);
-            height: min(520px, 58vh);
+            width: min(900px, 96vw);
+            height: min(600px, 65vh);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -53,11 +53,12 @@
         /* ── GROUND LIGHT ───────────────────────────────────────── */
         .ground-light {
             position: absolute;
-            bottom: 22px;
+            /* Adjusted to sit right beneath the scaled car's wheels */
+            bottom: 18%; 
             left: 50%;
             transform: translateX(-50%);
-            width: 46%;
-            height: 20px;
+            width: 55%;
+            height: 25px;
             z-index: 1;
             pointer-events: none;
             background: radial-gradient(ellipse at center, rgba(90, 180, 255, 0.85) 0%, rgba(64, 156, 255, 0.4) 55%, transparent 80%);
@@ -74,11 +75,6 @@
         }
 
         /* ── 3D CAR VIEWER ─────────────────────────────────────── */
-        /* This replaces both the old Sketchfab iframe AND the flat PNG.
-           camera-target is pinned to the model's own center, so orbiting
-           never drags the car off the podium/light — it only rotates in
-           place. min/max-camera-orbit locks the vertical (polar) angle so
-           it can't be spun upside-down or viewed from underneath. */
         model-viewer {
             position: relative;
             z-index: 2;
@@ -117,7 +113,7 @@
 
         .selector-dots {
             position: absolute;
-            bottom: 20%;
+            bottom: 8%;
             left: 50%;
             transform: translateX(-50%);
             z-index: 6;
@@ -156,8 +152,6 @@
         }
         .car-info-tag strong { color: #d4af37; display: block; font-size: 14px; }
 
-        /* Small, unobtrusive credit line — required by the model's CC BY
-           4.0 license. Sits bottom-right, low visual weight. */
         .model-credit {
             position: absolute;
             bottom: 6px;
@@ -209,12 +203,33 @@
         /* ── REV ANIMATION ─────────────────────────────────────── */
         @keyframes revShake {
             0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
-            20%       { transform: translate(calc(-50% - 3px), -50%) rotate(-0.5deg); }
-            40%       { transform: translate(calc(-50% + 3px), -50%) rotate(0.5deg); }
-            60%       { transform: translate(calc(-50% - 2px), -50%) rotate(-0.3deg); }
-            80%       { transform: translate(calc(-50% + 2px), -50%) rotate(0.3deg); }
+            20%        { transform: translate(calc(-50% - 3px), -50%) rotate(-0.5deg); }
+            40%        { transform: translate(calc(-50% + 3px), -50%) rotate(0.5deg); }
+            60%        { transform: translate(calc(-50% - 2px), -50%) rotate(-0.3deg); }
+            80%        { transform: translate(calc(-50% + 2px), -50%) rotate(0.3deg); }
         }
         .car-stage.revving { animation: revShake 0.18s linear 5; }
+
+        /* ── MOBILE LANDSCAPE RESPONSIVENESS ─────────────────────── */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .car-stage {
+                height: 80vh;
+                top: 50%;
+            }
+            .ui-container {
+                bottom: 3%;
+                transform: translateX(-50%) scale(0.85); /* Scales buttons down to fit */
+            }
+            .ground-light {
+                bottom: 12%; 
+            }
+            .selector-arrow {
+                width: 36px; height: 36px; font-size: 16px;
+            }
+            .car-info-tag {
+                top: 8px; left: 8px; padding: 6px 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -230,14 +245,18 @@
 
         <div class="ground-light"></div>
 
+        <!-- Added scale="1.3 1.3 1.3" to make the cars larger.
+             Adjusted camera-orbit from 78% to 65% for a closer default zoom.
+             Adjusted camera-target to center the larger model properly. -->
         <model-viewer
             id="carViewer"
             src="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/CarConcept/glTF-Binary/CarConcept.glb"
             alt="Concept GT showcase car"
             camera-controls
             disable-pan
-            camera-orbit="35deg 80deg 78%"
-            camera-target="0m 0.28m 0m"
+            scale="1.3 1.3 1.3" 
+            camera-orbit="35deg 80deg 65%"
+            camera-target="0m 0.15m 0m"
             field-of-view="30deg"
             min-camera-orbit="auto 58deg auto"
             max-camera-orbit="auto 98deg auto"
@@ -281,10 +300,6 @@
         alert('Starting Race!');
     }
 
-    // ── CAR SELECTOR ─────────────────────────────────────────────
-    // The Car Concept model ships with 3 built-in paint variants
-    // (KHR_materials_variants). Switching is instant — same model,
-    // no reload — using model-viewer's variantName property.
     const carOptions = [
         { variant: 'Carmine Candy',   label: 'Carmine Candy' },
         { variant: 'Pearly Swirly',   label: 'Pearly Swirly' },
@@ -296,7 +311,6 @@
     const trimLabel = document.getElementById('carTrim');
     const dotsWrap = document.getElementById('selectorDots');
 
-    // build dot indicators
     carOptions.forEach((opt, i) => {
         const dot = document.createElement('div');
         dot.className = 'dot' + (i === 0 ? ' active' : '');
@@ -318,7 +332,6 @@
         selectCar(currentCarIndex + direction);
     }
 
-    // apply the default variant once the model has finished loading
     viewer.addEventListener('load', () => {
         viewer.variantName = carOptions[currentCarIndex].variant;
     });
